@@ -39,3 +39,11 @@ Installing the pq package
 ```bash
 go get github.com/lib/pq
 ```
+
+Installing the Gorilla Mux, JWT, and Bcrypt packages
+
+```bash
+go get github.com/gorilla/mux
+go get github.com/dgrijalva/jwt-go
+go get golang.org/x/crypto/bcrypt
+```
