@@ -1,44 +1,90 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useRouter } from "next/navigation";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const HomePage = () => {
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [, setToken] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setIsLoading(false);
+        router.push("/login");
+        return;
+      }
       try {
-        // Use the environment variable for the backend URL
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`,
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/verify-token`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
-        setUsers(response.data);
-      } catch (err) {
-        setError("Failed to fetch data");
+        if (response.ok) {
+          setIsLoggedIn(true);
+        } else {
+          localStorage.removeItem("token");
+          router.push("/login");
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        router.push("/login");
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchData();
-  }, []);
+    verifyToken();
+  }, [router]);
 
-  if (error) {
-    return <div>{error}</div>;
+  const handleLogin = (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken("");
+    setIsLoggedIn(false);
+    router.push("/login");
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!isLoggedIn) {
+    return null;
   }
 
   return (
-    <div>
-      <h1>User List</h1>
-      {users.length > 0 ? (
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>
-              {user.name} - {user.email}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No users found</p>
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="flex justify-between items-center py-6">
+          <h1 className="text-3xl font-bold text-white">Home Page</h1>
+          <button
+            onClick={handleLogout}
+            className="bg-white text-indigo-600 px-4 py-2 rounded-md font-medium hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Logout
+          </button>
+        </nav>
+        <main className="mt-10">
+          <div className="bg-white p-8 rounded-lg shadow-xl">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              Welcome to Your Dashboard
+            </h2>
+            <p className="text-gray-600">You&apos;re successfully logged in!</p>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
