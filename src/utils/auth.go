@@ -1,17 +1,32 @@
 package utils
 
 import (
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtKey = []byte("123uigh89i")
+var jwtKey []byte
 
 type JWTClaims struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
+	key := os.Getenv("JWT_KEY")
+	if key == "" {
+		panic("JWT_KEY not set in .env file")
+	}
+	jwtKey = []byte(key)
 }
 
 func HashPassword(password string) (string, error) {

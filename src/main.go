@@ -8,10 +8,10 @@ import (
 	"os"
 
 	"github.com/adistrim/gohttp/handlers"
-
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -41,14 +41,24 @@ func main() {
 	}
 
 	r := mux.NewRouter()
-
 	r.HandleFunc("/register", handlers.RegisterHandler(db)).Methods("POST")
 	r.HandleFunc("/login", handlers.LoginHandler(db)).Methods("POST")
+
+	// Creating a CORS handler
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"*"},
+	})
+
+	// CORS handler
+	handler := c.Handler(r)
 
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
 		serverPort = "8080"
 	}
+
 	log.Printf("Listening on :%s...", serverPort)
-	log.Fatal(http.ListenAndServe(":"+serverPort, r))
+	log.Fatal(http.ListenAndServe(":"+serverPort, handler))
 }

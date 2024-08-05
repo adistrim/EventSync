@@ -47,3 +47,9 @@ go get github.com/gorilla/mux
 go get github.com/dgrijalva/jwt-go
 go get golang.org/x/crypto/bcrypt
 ```
+
+Installing the CORS package
+
+```bash
+go get -u github.com/rs/cors
+```
