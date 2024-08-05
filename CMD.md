@@ -16,6 +16,12 @@ INSERT INTO users (name, email) VALUES
 ('Bob', 'bob@example.com');
 ```
 
+Migrating the database from mysql postgresql (`neon db`)
+
+```bash
+psql -h ep-shiny-union-a1c66ows.ap-southeast-1.aws.neon.tech -U mydb_owner -d mydb -f backup.sql
+```
+
 Installing Go MySQL Driver
 
 ```bash
@@ -26,4 +32,10 @@ Installing the godotenv package
 
 ```bash
 go get github.com/joho/godotenv
+```
+
+Installing the pq package
+
+```bash
+go get github.com/lib/pq
 ```
