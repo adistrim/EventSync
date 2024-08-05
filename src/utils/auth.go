@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -54,4 +55,22 @@ func GenerateJWT(email string) (string, error) {
 		return "", err
 	}
 	return tokenString, nil
+}
+
+func VerifyToken(tokenString string) (*JWTClaims, error) {
+    claims := &JWTClaims{}
+
+    token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+        return jwtKey, nil
+    })
+
+    if err != nil {
+        return nil, err
+    }
+
+    if !token.Valid {
+        return nil, fmt.Errorf("invalid token")
+    }
+
+    return claims, nil
 }
