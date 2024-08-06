@@ -3,7 +3,6 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/adistrim/gohttp/utils"
@@ -57,7 +56,6 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		log.Println("LoginHandler: Querying database for user")
 		var hashedPassword string
 		err = db.QueryRow("SELECT password FROM users WHERE email = $1", creds.Email).Scan(&hashedPassword)
 		if err != nil {
@@ -69,20 +67,17 @@ func LoginHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		log.Println("LoginHandler: Comparing password hashes")
 		if !utils.CheckPasswordHash(creds.Password, hashedPassword) {
 			http.Error(w, "Invalid password", http.StatusUnauthorized)
 			return
 		}
 
-		log.Println("LoginHandler: Generating JWT")
 		token, err := utils.GenerateJWT(creds.Email)
 		if err != nil {
 			http.Error(w, "Error generating token: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		log.Println("LoginHandler: Successfully generated JWT")
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"token": token})
 	}

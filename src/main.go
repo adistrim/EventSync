@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/adistrim/gohttp/handlers"
-	// "github.com/adistrim/gohttp/middleware"
+	"github.com/adistrim/gohttp/middleware"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -45,7 +45,7 @@ func main() {
 	r.HandleFunc("/register", handlers.RegisterHandler(db)).Methods("POST")
 	r.HandleFunc("/login", handlers.LoginHandler(db)).Methods("POST")
 	r.HandleFunc("/verify-token", handlers.VerifyTokenHandler).Methods("POST")
-	// r.HandleFunc("/some-protected-route", middleware.AuthMiddleware(handlers.SomeProtectedHandler)).Methods("GET")
+	r.HandleFunc("/user-details", middleware.AuthMiddleware(handlers.UserDetailsHandler(db))).Methods("GET")
 
 	// Creating a CORS handler
 	c := cors.New(cors.Options{
