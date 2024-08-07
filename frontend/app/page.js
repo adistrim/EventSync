@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import AddEventPopup from "@/components/AddEventPopup";
 import "react-toastify/dist/ReactToastify.css";
+import EventList from "@/components/EventList";
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -151,6 +152,7 @@ const HomePage = () => {
               Add Event
             </button>
           </div>
+          <EventList />
         </main>
         {isPopupOpen && (
           <AddEventPopup
