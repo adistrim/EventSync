@@ -53,3 +53,9 @@ Installing the CORS package
 ```bash
 go get -u github.com/rs/cors
 ```
+
+Installing gomail package
+
+```bash
+go get github.com/go-gomail/gomail
+```

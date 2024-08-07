@@ -42,10 +42,16 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+
+	// API routes
 	r.HandleFunc("/register", handlers.RegisterHandler(db)).Methods("POST")
 	r.HandleFunc("/login", handlers.LoginHandler(db)).Methods("POST")
 	r.HandleFunc("/verify-token", handlers.VerifyTokenHandler).Methods("POST")
 	r.HandleFunc("/user-details", middleware.AuthMiddleware(handlers.UserDetailsHandler(db))).Methods("GET")
+	r.HandleFunc("/events", middleware.AuthMiddleware(handlers.CreateEventHandler(db))).Methods("POST")
+	r.HandleFunc("/participants", middleware.AuthMiddleware(handlers.AddParticipantsHandler(db))).Methods("POST")
+	r.HandleFunc("/notifications", middleware.AuthMiddleware(handlers.CreateNotificationHandler(db))).Methods("POST")
+	r.HandleFunc("/users", middleware.AuthMiddleware(handlers.GetUsersHandler(db))).Methods("GET")
 
 	// Creating a CORS handler
 	c := cors.New(cors.Options{
