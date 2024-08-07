@@ -58,19 +58,19 @@ func GenerateJWT(email string) (string, error) {
 }
 
 func VerifyToken(tokenString string) (*JWTClaims, error) {
-    claims := &JWTClaims{}
+	claims := &JWTClaims{}
 
-    token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-        return jwtKey, nil
-    })
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    if !token.Valid {
-        return nil, fmt.Errorf("invalid token")
-    }
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
 
-    return claims, nil
+	return claims, nil
 }

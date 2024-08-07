@@ -52,10 +52,11 @@ func main() {
 	r.HandleFunc("/participants", middleware.AuthMiddleware(handlers.AddParticipantsHandler(db))).Methods("POST")
 	r.HandleFunc("/notifications", middleware.AuthMiddleware(handlers.CreateNotificationHandler(db))).Methods("POST")
 	r.HandleFunc("/users", middleware.AuthMiddleware(handlers.GetUsersHandler(db))).Methods("GET")
+	r.HandleFunc("/events", middleware.AuthMiddleware(handlers.GetEventsHandler(db))).Methods("GET")
 
 	// Creating a CORS handler
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins: []string{"http://localhost:3000"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{"*"},
 	})
