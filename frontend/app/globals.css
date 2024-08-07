@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.Toastify__toast-container {
+    font-family:
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        "Noto Sans",
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+}
+
+.Toastify__close-button {
+    color: #4338ca; /* indigo-700 */
+}
+
+.Toastify__progress-bar {
+    background: linear-gradient(
+        to right,
+        #8b5cf6,
+        #3b82f6
+    ); /* purple-500 to blue-500 */
+}

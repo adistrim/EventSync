@@ -1,14 +1,50 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import AddEventPopup from "@/components/AddEventPopup";
+import "react-toastify/dist/ReactToastify.css";
 
 const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [, setToken] = useState("");
   const [name, setName] = useState("");
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const router = useRouter();
+
+  const handleEventCreated = (newEvent) => {
+    toast.success(
+      <div className="font-sans">
+        <h3 className="font-bold text-indigo-900">
+          Event Created Successfully!
+        </h3>
+        <p className="text-indigo-700">
+          Event Name: {newEvent.name || "Not available"}
+        </p>
+        <p className="text-indigo-700">
+          Date:{" "}
+          {newEvent.date
+            ? new Date(newEvent.date).toLocaleString()
+            : "Not available"}
+        </p>
+      </div>,
+      {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        className:
+          "bg-gradient-to-r from-purple-100 to-blue-100 border-l-4 border-indigo-500 rounded",
+        bodyClassName: "text-indigo-800",
+        progressClassName: "bg-indigo-500",
+      },
+    );
+  };
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -74,6 +110,14 @@ const HomePage = () => {
     router.push("/login");
   };
 
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -100,8 +144,20 @@ const HomePage = () => {
               Hi {name}, Welcome to Your Dashboard
             </h2>
             <p className="text-gray-600">You&apos;re successfully logged in!</p>
+            <button
+              onClick={handleOpenPopup}
+              className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            >
+              Add Event
+            </button>
           </div>
         </main>
+        {isPopupOpen && (
+          <AddEventPopup
+            onClose={handleClosePopup}
+            onEventCreated={handleEventCreated}
+          />
+        )}
       </div>
     </div>
   );
