@@ -53,6 +53,7 @@ func main() {
 	r.HandleFunc("/notifications", middleware.AuthMiddleware(handlers.CreateNotificationHandler(db))).Methods("POST")
 	r.HandleFunc("/users", middleware.AuthMiddleware(handlers.GetUsersHandler(db))).Methods("GET")
 	r.HandleFunc("/events", middleware.AuthMiddleware(handlers.GetEventsHandler(db))).Methods("GET")
+	r.HandleFunc("/user-events", middleware.AuthMiddleware(handlers.GetUserEventsHandler(db))).Methods("GET")
 
 	// Creating a CORS handler
 	c := cors.New(cors.Options{

@@ -55,7 +55,21 @@ func CreateEventHandler(db *sql.DB) http.HandlerFunc {
 
 func GetEventsHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rows, err := db.Query(`SELECT name, description, location, date FROM events`)
+		token := r.Header.Get("Authorization")
+		claims, err := utils.VerifyToken(token[7:])
+		if err != nil {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		var creatorID int
+		err = db.QueryRow("SELECT id FROM Users WHERE email = $1", claims.Email).Scan(&creatorID)
+		if err != nil {
+			http.Error(w, "Failed to get creator ID", http.StatusInternalServerError)
+			return
+		}
+
+		rows, err := db.Query(`SELECT name, description, location, date, category FROM Events WHERE creator_id = $1`, creatorID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -65,7 +79,50 @@ func GetEventsHandler(db *sql.DB) http.HandlerFunc {
 		var events []Event
 		for rows.Next() {
 			var event Event
-			if err := rows.Scan(&event.Name, &event.Description, &event.Location, &event.Date); err != nil {
+			if err := rows.Scan(&event.Name, &event.Description, &event.Location, &event.Date, &event.Category); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			events = append(events, event)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(events)
+	}
+}
+
+func GetUserEventsHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("Authorization")
+		claims, err := utils.VerifyToken(token[7:])
+		if err != nil {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		var userID int
+		err = db.QueryRow("SELECT id FROM Users WHERE email = $1", claims.Email).Scan(&userID)
+		if err != nil {
+			http.Error(w, "Failed to get user ID", http.StatusInternalServerError)
+			return
+		}
+
+		query := `
+			SELECT e.name, e.description, e.location, e.date, e.category
+			FROM Events e
+			INNER JOIN Participants p ON e.id = p.event_id
+			WHERE p.user_id = $1`
+		rows, err := db.Query(query, userID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		var events []Event
+		for rows.Next() {
+			var event Event
+			if err := rows.Scan(&event.Name, &event.Description, &event.Location, &event.Date, &event.Category); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
